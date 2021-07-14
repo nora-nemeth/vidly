@@ -26,8 +26,10 @@ class DisplayMovies extends Component {
   }
 
   displayText() {
-    if (this.state.movies.length > 0) {
-      return <p>Showing {this.state.movies.length} movies in the database.</p>;
+    const { length: count } = this.state.movies;
+
+    if (count > 0) {
+      return <p>Showing {count} movies in the database.</p>;
     } else {
       return <p>There are no movies in the database.</p>;
     }
