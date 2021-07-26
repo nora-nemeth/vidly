@@ -1,9 +1,9 @@
-import DisplayMovies from './components/movies';
+import Movies from './components/movies';
 
 function App() {
   return (
     <main className="container">
-      <DisplayMovies />
+      <Movies />
     </main>
   );
 }

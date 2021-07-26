@@ -1,40 +1,18 @@
 import React, { Component } from 'react';
-import { getMovies, deleteMovie } from '../services/fakeMovieService';
+import { getMovies } from '../services/fakeMovieService';
 import Like from './common/like';
+import Pagination from './common/pagination';
 
-class DisplayMovies extends Component {
+class Movies extends Component {
   state = {
     movies: getMovies(),
+    pageSize: 10,
   };
 
-  render() {
-    return (
-      <React.Fragment>
-        {this.displayText()}
-        <table>
-          <thead>
-            <tr>
-              <th className="pr-4 pl-4 pt-4">Title</th>
-              <th className="pr-4 pl-4 pt-4">Genre</th>
-              <th className="pr-4 pl-4 pt-4">Stock</th>
-              <th className="pr-4 pl-4 pt-4">Rate</th>
-            </tr>
-          </thead>
-          {this.renderFilms()}
-        </table>
-      </React.Fragment>
-    );
-  }
-
-  displayText() {
-    const { length: count } = this.state.movies;
-
-    if (count > 0) {
-      return <p>Showing {count} movies in the database.</p>;
-    } else {
-      return <p>There are no movies in the database.</p>;
-    }
-  }
+  handleDelete = (movie) => {
+    const movies = this.state.movies.filter((m) => m._id !== movie._id);
+    this.setState({ movies });
+  };
 
   handleLike = (movie) => {
     const movies = [...this.state.movies];
@@ -44,57 +22,64 @@ class DisplayMovies extends Component {
     this.setState({ movies });
   };
 
-  renderFilms() {
+  handlePageChange = (page) => {
+    console.log(page);
+  };
+
+  render() {
+    const { length: count } = this.state.movies;
+
+    if (count === 0) {
+      return <p>There are no movies in the database.</p>;
+    }
+
     return (
-      <tbody>
-        {this.state.movies.map((movie) => (
-          <tr key={`${Math.random()}`}>
-            <td key={`${movie._id} ${movie.title}`} className="pr-4 pl-4 pt-4">
-              {movie.title}
-            </td>
-            <td
-              key={`${movie._id} ${movie.genre.name}`}
-              className="pr-4 pl-4 pt-4"
-            >
-              {movie.genre.name}
-            </td>
-            <td
-              key={`${movie._id} ${movie.numberInStock}`}
-              className="pr-4 pl-4 pt-4"
-            >
-              {movie.numberInStock}
-            </td>
-            <td
-              key={`${movie._id} ${movie.dailyRentalRate}`}
-              className="pr-4 pl-4 pt-4"
-            >
-              {movie.dailyRentalRate}
-            </td>
-            <td>
-              <Like
-                liked={movie.liked}
-                onClick={() => this.handleLike(movie)}
-              />
-            </td>
-            <td key={movie._id}>
-              <button
-                key={movie._id}
-                data-key={movie._id}
-                onClick={this.deleteMovieRow}
-                className="btn btn-danger mr-4 ml-4 mt-4"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
+      <React.Fragment>
+        <p>Showing {count} movies in the database.</p>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Genre</th>
+              <th>Stock</th>
+              <th>Rate</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.movies.map((movie) => (
+              <tr key={movie._id}>
+                <td>{movie.title}</td>
+                <td>{movie.genre.name}</td>
+                <td>{movie.numberInStock}</td>
+                <td>{movie.dailyRentalRate}</td>
+                <td>
+                  <Like
+                    liked={movie.liked}
+                    onClick={() => this.handleLike(movie)}
+                  />
+                </td>
+                <td>
+                  <button
+                    onClick={() => this.handleDelete(movie)}
+                    className="btn btn-danger btn-sm"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <Pagination
+          itemsCount={count}
+          pageSize={this.state.pageSize}
+          onPageChange={this.handlePageChange}
+        />
+      </React.Fragment>
     );
   }
-
-  deleteMovieRow = (event) => {
-    this.setState(deleteMovie(event.target.getAttribute('data-key')));
-  };
 }
 
-export default DisplayMovies;
+export default Movies;
